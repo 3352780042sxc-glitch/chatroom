@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chengchatroom</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- 左侧边栏 -->
+        <div class="chat-sidebar">
+            <!-- 头部信息 -->
+            <div class="chat-header">
+                <h2>chengchatroom</h2>
+                <div class="user-info">
+                    <h3>欢迎，<span id="current-user">{{ nickname }}</span></h3>
+                    <p><a href="/logout">退出</a></p>
+                </div>
+            </div>
+            
+            <!-- 搜索栏 -->
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="搜索聊天...">
+            </div>
+            
+            <!-- 公共聊天室 -->
+            <div class="contact-item active">
+                <div class="avatar">公</div>
+                <div class="contact-info">
+                    <div class="contact-name">公共聊天室</div>
+                    <div class="contact-message">在线群聊</div>
+                </div>
+                <div class="contact-time"></div>
+            </div>
+            
+            <!-- 用户列表 -->
+            <div class="user-info">
+                <h3>在线用户</h3>
+                <p id="online-count">0 人在线</p>
+            </div>
+            <div id="contact-list" class="contact-list">
+                <!-- 用户列表会通过JavaScript动态添加 -->
+            </div>
+        </div>
+        
+        <!-- 主聊天区域 -->
+        <div class="chat-main">
+            <!-- 聊天头部 -->
+            <div class="chat-header">
+                <div class="chat-header-left">
+                    <h2>公共聊天室</h2>
+                    <span class="chat-status">在线群聊</span>
+                </div>
+                <div class="chat-header-right">
+                    <button class="tool-button" title="刷新"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg></button>
+                    <button class="tool-button" title="更多"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chat-messages">
+                <div class="system-message">
+                    <span class="system-text">欢迎加入聊天室！</span>
+                </div>
+                <!-- 聊天消息将通过JavaScript动态生成 -->
+            </div>
+            
+            <div class="chat-input-area">
+                <!-- 工具栏 -->
+                <div class="input-toolbar">
+                    <button id="emoji-btn" class="tool-button" title="表情">😊</button>
+                    <button class="tool-button" title="图片">🖼️</button>
+                    <button class="tool-button" title="文件">📎</button>
+                    <button class="tool-button" title="语音">🎤</button>
+                    <button class="tool-button" title="更多">⋯</button>
+                </div>
+                
+                <!-- @功能区域 -->
+                <div class="at-features">
+                    <button class="at-button" data-command="@包子">@包子</button>
+                    <button class="at-button" data-command="@音乐一下">@音乐一下</button>
+                    <button class="at-button" data-command="@电影">@电影</button>
+                    <button class="at-button" data-command="@天气">@天气</button>
+                    <button class="at-button" data-command="@新闻">@新闻</button>
+                    <button class="at-button" data-command="@小视频">@小视频</button>
+                </div>
+                
+                <div id="emoji-panel" class="emoji-panel">
+                    <!-- Emoji面板将通过JavaScript动态生成 -->
+                </div>
+                
+                <div class="input-container">
+                    <textarea id="message-input" class="message-input" placeholder="输入消息..." rows="1"></textarea>
+                    <button id="send-btn" class="send-button" disabled>发送</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+</body>
+</html>

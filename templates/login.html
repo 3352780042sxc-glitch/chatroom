@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chengchatroom - 登录</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="login-body">
+    <div class="login-container">
+        <div class="login-header">
+            <h1>chengchatroom</h1>
+            <p>请输入您的信息进行登录</p>
+        </div>
+
+        <div class="login-form">
+            <div class="form-group">
+                <label for="nickname">昵称</label>
+                <input type="text" id="nickname" placeholder="请输入您的昵称" required>
+            </div>
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" placeholder="请输入密码" required>
+            </div>
+            <div class="form-group">
+                <label for="server_url">服务器地址</label>
+                <select id="server_url" required>
+                    <option value="">请选择服务器</option>
+                    {% for server in servers %}
+                    <option value="{{ server.url }}">{{ server.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button id="login-btn" class="login-button">登录</button>
+        </div>
+        <div id="message" class="message"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+</body>
+</html>

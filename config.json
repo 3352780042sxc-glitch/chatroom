@@ -1,0 +1,20 @@
+{
+    "servers": [
+        {
+            "name": "本地服务器",
+            "url": "http://localhost:5000"
+        },
+        {
+            "name": "公用服务器1",
+            "url": "http://localhost:5001"
+        },
+        {
+            "name": "公用服务器2",
+            "url": "http://localhost:5002"
+        }
+    ],
+    "fixed_password": "123456",
+    "secret_key": "your-secret-key-change-this-in-production",
+    "server_port": 5000,
+    "weather_api_key": "xiaoxiaoapi"
+}
