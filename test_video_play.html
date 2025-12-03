@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频播放测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        video {
+            width: 100%;
+            max-width: 640px;
+            border-radius: 8px;
+        }
+        .log {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>视频播放测试</h1>
+    
+    <div class="test-section">
+        <h2>直接视频播放</h2>
+        <p>测试视频URL: https://videos.xxapi.cn/e7f36091e3c1974b.mp4</p>
+        <video width="100%" controls>
+            <source src="https://videos.xxapi.cn/e7f36091e3c1974b.mp4" type="video/mp4">
+            您的浏览器不支持HTML5视频播放
+        </video>
+        <div class="log" id="log1"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>带错误处理的视频播放</h2>
+        <video width="100%" controls onerror="handleVideoError(this)">
+            <source src="https://videos.xxapi.cn/e7f36091e3c1974b.mp4" type="video/mp4">
+            您的浏览器不支持HTML5视频播放
+        </video>
+        <div class="log" id="log2"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>跨域检查</h2>
+        <p>检查视频URL是否允许跨域访问：</p>
+        <button onclick="checkCORS()">检查CORS</button>
+        <div class="log" id="corsLog"></div>
+    </div>
+
+    <script>
+        // 视频事件监听
+        document.querySelectorAll('video').forEach((video, index) => {
+            const logId = index === 0 ? 'log1' : 'log2';
+            
+            video.addEventListener('loadedmetadata', () => {
+                log(logId, `视频加载元数据成功: ${video.videoWidth}x${video.videoHeight}, 时长: ${video.duration}秒`);
+            });
+            
+            video.addEventListener('play', () => {
+                log(logId, '视频开始播放');
+            });
+            
+            video.addEventListener('pause', () => {
+                log(logId, '视频暂停');
+            });
+            
+            video.addEventListener('ended', () => {
+                log(logId, '视频播放结束');
+            });
+            
+            video.addEventListener('error', (e) => {
+                log(logId, `视频错误: ${e.target.error.code} - ${e.target.error.message}`);
+            });
+            
+            video.addEventListener('waiting', () => {
+                log(logId, '视频缓冲中...');
+            });
+            
+            video.addEventListener('playing', () => {
+                log(logId, '视频正在播放');
+            });
+        });
+        
+        function handleVideoError(video) {
+            console.error('视频加载失败:', video.error);
+        }
+        
+        function checkCORS() {
+            const log = document.getElementById('corsLog');
+            log.textContent = '正在检查CORS...\n';
+            
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', 'https://videos.xxapi.cn/e7f36091e3c1974b.mp4', true);
+            xhr.setRequestHeader('Origin', window.location.origin);
+            
+            xhr.onload = function() {
+                log.textContent += `状态码: ${xhr.status}\n`;
+                log.textContent += `响应头: ${JSON.stringify(xhr.getAllResponseHeaders(), null, 2)}\n`;
+                log.textContent += `允许的源: ${xhr.getResponseHeader('Access-Control-Allow-Origin')}\n`;
+                log.textContent += `允许的方法: ${xhr.getResponseHeader('Access-Control-Allow-Methods')}\n`;
+            };
+            
+            xhr.onerror = function() {
+                log.textContent += 'CORS请求失败\n';
+            };
+            
+            xhr.send();
+        }
+        
+        function log(logId, message) {
+            const logElement = document.getElementById(logId);
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.textContent += `[${timestamp}] ${message}\n`;
+        }
+    </script>
+</body>
+</html>

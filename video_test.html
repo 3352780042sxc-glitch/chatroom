@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频播放测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        video {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .log {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        button {
+            margin: 5px;
+            padding: 8px 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>视频播放测试页面</h1>
+    
+    <div class="test-section">
+        <h2>测试1: 默认视频播放（带事件日志）</h2>
+        <video id="testVideo1" width="100%" controls="controls" poster="https://via.placeholder.com/640x360/cccccc/999999?text=视频加载中..."
+               autoplay="false" playsinline="playsinline" preload="metadata">
+            <source id="videoSource1" src="" type="video/mp4">
+            您的浏览器不支持HTML5视频播放
+        </video>
+        <div id="log1" class="log"></div>
+        <button onclick="loadAndTestVideo()">加载测试视频</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>测试2: 直接视频URL测试</h2>
+        <input type="text" id="videoUrl" placeholder="输入视频URL" style="width: 60%; padding: 8px;">
+        <button onclick="testCustomUrl()">测试URL</button>
+        <video id="testVideo2" width="100%" controls="controls" poster="https://via.placeholder.com/640x360/cccccc/999999?text=视频加载中..."
+               autoplay="false" playsinline="playsinline" preload="metadata">
+            <source id="videoSource2" src="" type="video/mp4">
+            您的浏览器不支持HTML5视频播放
+        </video>
+        <div id="log2" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>测试3: 视频元数据检查</h2>
+        <div id="metadataResult"></div>
+    </div>
+    
+    <script>
+        // 记录日志
+        function log(elementId, message) {
+            const logDiv = document.getElementById(elementId);
+            logDiv.innerHTML += new Date().toLocaleTimeString() + ': ' + message + '<br>';
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        // 添加视频事件监听器
+        function addVideoEventListeners(videoId, logId) {
+            const video = document.getElementById(videoId);
+            
+            video.addEventListener('loadstart', () => log(logId, 'loadstart: 视频开始加载'));
+            video.addEventListener('loadedmetadata', () => log(logId, 'loadedmetadata: 元数据加载完成'));
+            video.addEventListener('loadeddata', () => log(logId, 'loadeddata: 首帧数据加载完成'));
+            video.addEventListener('canplay', () => log(logId, 'canplay: 可以开始播放'));
+            video.addEventListener('play', () => log(logId, 'play: 视频开始播放'));
+            video.addEventListener('pause', () => log(logId, 'pause: 视频暂停'));
+            video.addEventListener('ended', () => log(logId, 'ended: 视频播放结束'));
+            video.addEventListener('error', (e) => log(logId, 'error: 视频播放错误 - ' + e.target.error.code));
+            video.addEventListener('stalled', () => log(logId, 'stalled: 视频加载中断'));
+            video.addEventListener('waiting', () => log(logId, 'waiting: 等待数据'));
+            video.addEventListener('playing', () => log(logId, 'playing: 视频正在播放'));
+        }
+        
+        // 初始设置
+        addVideoEventListeners('testVideo1', 'log1');
+        addVideoEventListeners('testVideo2', 'log2');
+        
+        // 加载测试视频
+        function loadAndTestVideo() {
+            const source = document.getElementById('videoSource1');
+            const video = document.getElementById('testVideo1');
+            const logDiv = document.getElementById('log1');
+            
+            logDiv.innerHTML = '正在加载测试视频...<br>';
+            
+            // 从API获取视频URL
+            fetch('https://v2.xxapi.cn/api/meinv', {
+                headers: {
+                    'User-Agent': 'xiaoxiaoapi/1.0.0'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 200 && data.data) {
+                    const videoUrl = data.data;
+                    log('log1', '获取到视频URL: ' + videoUrl);
+                    source.src = videoUrl;
+                    video.load();
+                    log('log1', '视频加载命令已发送');
+                } else {
+                    log('log1', 'API请求失败: ' + data.msg);
+                }
+            })
+            .catch(error => {
+                log('log1', 'API请求错误: ' + error);
+            });
+        }
+        
+        // 测试自定义URL
+        function testCustomUrl() {
+            const urlInput = document.getElementById('videoUrl');
+            const source = document.getElementById('videoSource2');
+            const video = document.getElementById('testVideo2');
+            const logDiv = document.getElementById('log2');
+            
+            const videoUrl = urlInput.value;
+            if (!videoUrl) {
+                log('log2', '请输入视频URL');
+                return;
+            }
+            
+            logDiv.innerHTML = '正在测试URL: ' + videoUrl + '<br>';
+            source.src = videoUrl;
+            video.load();
+            log('log2', '视频加载命令已发送');
+        }
+        
+        // 检查视频元数据
+        function checkVideoMetadata() {
+            const video = document.getElementById('testVideo1');
+            const resultDiv = document.getElementById('metadataResult');
+            
+            if (video.readyState >= 1) {
+                resultDiv.innerHTML = `
+                    <div class="success">视频元数据:</div>
+                    <ul>
+                        <li>时长: ${video.duration} 秒</li>
+                        <li>宽度: ${video.videoWidth}px</li>
+                        <li>高度: ${video.videoHeight}px</li>
+                        <li>就绪状态: ${video.readyState}</li>
+                        <li>网络状态: ${video.networkState}</li>
+                    </ul>
+                `;
+            } else {
+                resultDiv.innerHTML = '<div class="error">请先加载视频</div>';
+            }
+        }
+        
+        // 页面加载完成后自动加载测试视频
+        window.addEventListener('load', () => {
+            setTimeout(loadAndTestVideo, 1000);
+        });
+    </script>
+</body>
+</html>
